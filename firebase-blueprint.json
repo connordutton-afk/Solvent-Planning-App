@@ -1,0 +1,165 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user settings and balance information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "balance": { "type": "number", "description": "Current available money." },
+        "startingBalance": { "type": "number", "description": "Initial balance for tracking." },
+        "savingsPercentage": { "type": "number", "description": "Global savings target percentage." },
+        "payPerPaycheck": { "type": "number" },
+        "currentGradeLevel": { "type": "string" },
+        "targetGradeAverage": { "type": "number" },
+        "learningChallenges": { "type": "string" },
+        "age": { "type": "number" },
+        "certifications": { "type": "array", "items": { "type": "string" } },
+        "permits": { "type": "array", "items": { "type": "string" } },
+        "careerDetails": { "type": "string" },
+        "notificationSoundUrl": { "type": "string", "description": "Data URL for custom notification sound." },
+        "clickSoundUrl": { "type": "string", "description": "Data URL for custom click sound." }
+      },
+      "required": ["uid", "balance"]
+    },
+    "CalendarEvent": {
+      "title": "Calendar Event",
+      "description": "An entry in the user's calendar with persistence and alerts.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["work", "personal", "task", "school"] },
+        "isUrgent": { "type": "boolean" },
+        "recurrence": { "type": "string", "enum": ["none", "daily", "weekdays", "weekends", "bi-daily", "weekly", "monthly", "annually", "one-off"] },
+        "parentId": { "type": "string", "description": "ID of parent event for nesting." }
+      },
+      "required": ["userId", "title", "startTime", "endTime"]
+    },
+    "Earning": {
+      "title": "Earning / Paycheck",
+      "description": "Record of work and income for a specific period.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number", "description": "Total made in the week." },
+        "hours": { "type": "number", "description": "Total hours worked." },
+        "date": { "type": "string", "format": "date", "description": "Date of the paycheck or week ending." },
+        "status": { "type": "string", "enum": ["pending", "paid"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "hours", "date", "status"]
+    },
+    "BudgetGoal": {
+      "title": "Budget Goal / Note Pad",
+      "description": "A specific item or fund the user is saving for.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "item": { "type": "string" },
+        "price": { "type": "number" },
+        "estWeeks": { "type": "number", "description": "Estimated time till purchase in weeks." },
+        "percentNeeded": { "type": "number" },
+        "percentWanted": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "item", "price"]
+    },
+    "SchoolNote": {
+      "title": "School Note",
+      "description": "General notes for classes and studying.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "title", "content"]
+    },
+    "AcademicRecord": {
+      "title": "Academic Record",
+      "description": "Tracking grades and progress in specific subjects.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "periodId": { "type": "string", "description": "Reference to academic session." },
+        "grade": { "type": "string" },
+        "currentProgress": { "type": "number" },
+        "actualGrade": { "type": "number" },
+        "extraKnowledge": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "subject", "grade", "periodId"]
+    },
+    "AcademicSession": {
+      "title": "Academic Session",
+      "description": "A set duration like a school year or semester.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "schoolName": { "type": "string" },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" }
+      },
+      "required": ["userId", "name", "startDate", "endDate"]
+    },
+    "TimelyExpense": {
+      "title": "Timely Expense",
+      "description": "Recurring expense for budget tracking.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "item": { "type": "string" },
+        "amount": { "type": "number" },
+        "frequency": { "type": "string", "enum": ["Daily", "Weekly", "Bi-Weekly", "Monthly"] },
+        "isAutoDeduce": { "type": "boolean" },
+        "isUrgent": { "type": "boolean", "description": "Whether this deduction comes before all others." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "item", "amount", "frequency"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user profiles and global settings."
+    },
+    "/events/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Calendar events for the user."
+    },
+    "/earnings/{earningId}": {
+      "schema": "Earning",
+      "description": "Work history and paychecks."
+    },
+    "/budget_goals/{goalId}": {
+      "schema": "BudgetGoal",
+      "description": "Custom budgeting note pads/goals."
+    },
+    "/school_notes/{noteId}": {
+      "schema": "SchoolNote",
+      "description": "User's academic notes."
+    },
+    "/academic_records/{recordId}": {
+      "schema": "AcademicRecord",
+      "description": "Grades and progress tracking."
+    },
+    "/academic_sessions/{sessionId}": {
+      "schema": "AcademicSession",
+      "description": "School years or terms."
+    },
+    "/timely_expenses/{expenseId}": {
+      "schema": "TimelyExpense",
+      "description": "Recurring expenses for the user."
+    }
+  }
+}
